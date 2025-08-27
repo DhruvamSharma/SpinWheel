@@ -47,7 +47,7 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
   void startSpinning() {
     if (_isSpinning) return;
 
-    _rotationSpeed = 0.3; // Fast initial speed
+    _rotationSpeed = 0.4; // Fast initial speed
     _isSpinning = true;
     _ticker.start();
   }
@@ -155,7 +155,13 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
                 ),
                 // Pointer at 3 o'clock (right center)
                 GestureDetector(
-                  onTap: startSpinning,
+                  onTap: () {
+                    if (_isSpinning) {
+                      stopSpinning(1); // For demo, always stop at index 1
+                    } else {
+                      startSpinning();
+                    }
+                  },
                   child: const CircleAvatar(
                     backgroundColor: Colors.white,
                     child: Icon(
