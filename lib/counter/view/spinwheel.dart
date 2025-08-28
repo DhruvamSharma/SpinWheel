@@ -21,7 +21,6 @@ class SpinWheel extends StatefulWidget {
 }
 
 class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
-
   late Ticker _ticker;
   late AnimationController _stopController;
   late Animation<double> _stopAnimation;
@@ -35,7 +34,8 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
     super.initState();
 
     _ticker = createTicker(_onTick);
-    _stopController = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _stopController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
   }
 
   void _onTick(Duration elapsed) {
@@ -53,14 +53,17 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
   }
 
   void stopSpinning(int targetIndex) {
+    if (targetIndex <= 0 || targetIndex > widget.labels.length) return;
     if (!_isSpinning) return;
     _isSpinning = false;
     _ticker.stop();
 
     // Pick a segment
     final anglePerSegment = 2 * pi / widget.labels.length;
-    final correction = (anglePerSegment / 2); // Right pointer = 0 radians
-    final targetAngle = ((widget.labels.length + 1 - targetIndex) * anglePerSegment) - correction;
+    final correction = anglePerSegment / 2; // Right pointer = 0 radians
+    final targetAngle =
+        ((widget.labels.length + 1 - targetIndex) * anglePerSegment) -
+            correction;
 
     const fullSpins = 4 * (2 * pi); // more spins to slow down nicely
     final finalAngle = fullSpins + targetAngle;
@@ -68,7 +71,8 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
     _stopAnimation = Tween<double>(
       begin: 0,
       end: finalAngle,
-    ).animate(CurvedAnimation(parent: _stopController, curve: Curves.easeOutCubic))
+    ).animate(
+        CurvedAnimation(parent: _stopController, curve: Curves.easeOutCubic))
       ..addListener(() {
         setState(() {
           _currentAngle = _stopAnimation.value;
@@ -109,8 +113,7 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
                           children: [
                             // Paint the wheel
                             CustomPaint(
-                              painter:
-                                  SpinWheelPainter(labels: widget.labels),
+                              painter: SpinWheelPainter(labels: widget.labels),
                               size: const Size(size, size),
                             ),
                             // Overlay widgets
@@ -118,11 +121,11 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
                               final sliceAngle = 2 * pi / segmentCount;
                               final centerAngle =
                                   i * sliceAngle + sliceAngle / 2;
-                      
+
                               const radius = size / 3;
                               final dx = radius * cos(centerAngle);
                               final dy = radius * sin(centerAngle);
-                      
+
                               return Transform.translate(
                                 offset: Offset(dx, dy),
                                 child: Transform.rotate(
@@ -155,13 +158,7 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
                 ),
                 // Pointer at 3 o'clock (right center)
                 GestureDetector(
-                  onTap: () {
-                    if (_isSpinning) {
-                      stopSpinning(1); // For demo, always stop at index 1
-                    } else {
-                      startSpinning();
-                    }
-                  },
+                  onTap: startOrStopSpinning,
                   child: const CircleAvatar(
                     backgroundColor: Colors.white,
                     child: Icon(
@@ -182,16 +179,14 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: startSpinning,
+                      onPressed: startOrStopSpinning,
                       child: const Text('Spin'),
                     ),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        stopSpinning(1);
-                      },
+                      onPressed: startOrStopSpinning,
                       child: const Text('Stop'),
                     ),
                   ),
@@ -202,6 +197,14 @@ class _SpinWheelState extends State<SpinWheel> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  void startOrStopSpinning() {
+    if (_isSpinning) {
+      stopSpinning(8); // For demo, always stop at index 1
+    } else {
+      startSpinning();
+    }
   }
 }
 
